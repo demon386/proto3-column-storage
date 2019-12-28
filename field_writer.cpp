@@ -55,6 +55,38 @@ FieldWriter* MsgWriter::GetChild(int field_number) {
   return field_writers_.at(field_number).get();
 }
 
+void MsgWriter::AddVersion(int repetition_level) {
+  MsgValue val;
+  val.repetition_level = repetition_level;
+  if (parent_) {
+    val.parent_version = parent_->Version();
+    CHECK_GE(val.parent_version, 0);
+  }
+  versions_.push_back(std::move(val));
+}
+
+void MsgWriter::Flush(int parent_version, int repetition_level, int def_level) {
+  bool printed = false;
+  while (version_cursor_ < versions_.size() &&
+         (parent_ == nullptr ||
+          versions_[version_cursor_].parent_version == parent_version)) {
+    repetition_level = versions_[version_cursor_].repetition_level;
+    def_level = definition_level();
+    parent_version = version_cursor_;
+    version_cursor_++;
+    printed = true;
+    for (auto& writer : field_writers_) {
+      writer.second->Flush(parent_version, repetition_level, def_level);
+    }
+  }
+  if (!printed && parent_ != nullptr) {
+    parent_version = -1;
+    for (auto& writer : field_writers_) {
+      writer.second->Flush(parent_version, repetition_level, def_level);
+    }
+  }
+}
+
 void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
                    int repetition_level) {
   writer->AddVersion(repetition_level);

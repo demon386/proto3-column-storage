@@ -49,48 +49,20 @@ class MsgWriter : public FieldWriter {
 
   FieldWriter* GetChild(int field_number);
 
+  void AddVersion(int repetition_level);
+
+  int Version() { return versions_.size() - 1; }
+
+  void Flush(int parent_version, int repetition_level, int def_level) override;
+
+  bool is_atomic() const override { return false; }
+
+ private:
   struct MsgValue {
     int parent_version;
     int repetition_level;
   };
 
-  void AddVersion(int repetition_level) {
-    MsgValue val;
-    val.repetition_level = repetition_level;
-    if (parent_) {
-      val.parent_version = parent_->Version();
-      CHECK_GE(val.parent_version, 0);
-    }
-    versions_.push_back(std::move(val));
-  }
-
-  int Version() { return versions_.size() - 1; }
-
-  void Flush(int parent_version, int repetition_level, int def_level) override {
-    bool printed = false;
-    while (version_cursor_ < versions_.size() &&
-           (parent_ == nullptr ||
-            versions_[version_cursor_].parent_version == parent_version)) {
-      repetition_level = versions_[version_cursor_].repetition_level;
-      def_level = definition_level();
-      parent_version = version_cursor_;
-      version_cursor_++;
-      printed = true;
-      for (auto& writer : field_writers_) {
-        writer.second->Flush(parent_version, repetition_level, def_level);
-      }
-    }
-    if (!printed && parent_ != nullptr) {
-      parent_version = -1;
-      for (auto& writer : field_writers_) {
-        writer.second->Flush(parent_version, repetition_level, def_level);
-      }
-    }
-  }
-
-  virtual bool is_atomic() const override { return false; }
-
- private:
   std::map<int, std::unique_ptr<FieldWriter>> field_writers_;
   std::vector<MsgValue> versions_;
   int version_cursor_ = 0;
