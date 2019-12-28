@@ -6,6 +6,8 @@
 #include <glog/logging.h>
 #include <google/protobuf/message.h>
 
+namespace proto_column_storage {
+
 class RecordDecoder {
  public:
   RecordDecoder(const google::protobuf::Message* message) {
@@ -60,5 +62,7 @@ class RecordDecoder {
   const google::protobuf::Reflection* reflection_;
   std::vector<const google::protobuf::FieldDescriptor*> fields_;
 };
+
+}  // namespace proto_column_storage
 
 #endif  // RECORD_DECODER_

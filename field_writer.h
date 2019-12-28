@@ -10,6 +10,8 @@
 #include "proto_traits.h"
 #include "record_decoder.h"
 
+namespace proto_column_storage {
+
 class FieldWriter {
  public:
   FieldWriter(int field_number, int repetition_level, int definition_level,
@@ -138,5 +140,7 @@ class AtomicWriter : public AtomicWriterBase {
 
 void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
                    int repetition_level);
+
+}  // namespace proto_column_storage
 
 #endif  // FIELD_WRITER_

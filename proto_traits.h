@@ -5,6 +5,8 @@
 
 #include <google/protobuf/message.h>
 
+namespace proto_column_storage {
+
 template <typename google::protobuf::FieldDescriptor::CppType T>
 struct ProtoTraits;
 
@@ -37,5 +39,7 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_STRING> {
     }
   }
 };
+
+}  // namespace proto_column_storage
 
 #endif  // PROTO_TRAITS_H_

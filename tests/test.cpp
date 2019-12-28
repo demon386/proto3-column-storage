@@ -7,6 +7,8 @@
 #include "record_decoder.h"
 #include "test.pb.h"
 
+using namespace proto_column_storage;
+
 TEST(Dummy, DissectRecord) {
   pb::Document doc;
   pb::Document::Links links;

@@ -2,6 +2,8 @@
 
 #include <glog/logging.h>
 
+namespace proto_column_storage {
+
 std::unique_ptr<FieldWriter> MakeFieldWriter(
     const google::protobuf::FieldDescriptor& field_descriptor,
     int repetition_level, int definition_level, MsgWriter* parent) {
@@ -125,3 +127,5 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
     }
   }
 }
+
+}  // namespace proto_column_storage
