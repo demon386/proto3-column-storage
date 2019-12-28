@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+message Document {
+  int64 doc_id = 1;
+  message Links {
+    repeated int64 backward = 1;
+    repeated int64 forward = 2;
+  }
+  Links links = 2;
+  message Name {
+    message Language {
+      repeated string code = 1;
+      string country = 2;
+    }
+    repeated Language language = 1;
+    string url = 2;
+  }
+  int64 mytest = 3;
+  Name name = 4;
+}
