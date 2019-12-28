@@ -16,25 +16,29 @@ std::unique_ptr<FieldWriter> MakeFieldWriter(
   const int number = field_descriptor.number();
 
   const auto cpp_type = field_descriptor.cpp_type();
-  if (cpp_type == google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
-    return std::make_unique<MsgWriter>(*field_descriptor.message_type(), number,
-                                       repetition_level, definition_level,
-                                       field_descriptor.name(), parent);
-  } else if (cpp_type == google::protobuf::FieldDescriptor::CPPTYPE_INT64) {
-    using Writer =
-        AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_INT64>;
-    return std::make_unique<Writer>(number, repetition_level, definition_level,
-                                    field_descriptor.name(), parent);
-  } else if (cpp_type == google::protobuf::FieldDescriptor::CPPTYPE_STRING) {
-    using Writer =
-        AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_STRING>;
-    return std::make_unique<Writer>(number, repetition_level, definition_level,
-                                    field_descriptor.name(), parent);
-  } else {
-    // Not implemented yet.
-    DCHECK(false);
-    return nullptr;
+  switch (cpp_type) {
+    case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
+      return std::make_unique<MsgWriter>(
+          *field_descriptor.message_type(), number, repetition_level,
+          definition_level, field_descriptor.name(), parent);
+    }
+    case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
+      using Writer =
+          AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_INT64>;
+      return std::make_unique<Writer>(number, repetition_level,
+                                      definition_level, field_descriptor.name(),
+                                      parent);
+    }
+    case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
+      using Writer =
+          AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_STRING>;
+      return std::make_unique<Writer>(number, repetition_level,
+                                      definition_level, field_descriptor.name(),
+                                      parent);
+    }
   }
+  DCHECK(false) << "Not implemented yet";
+  return nullptr;
 }
 
 MsgWriter::MsgWriter(const google::protobuf::Descriptor& descriptor,
