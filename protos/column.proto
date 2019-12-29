@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package pb;
+
+message Column {
+  bytes repetition_levels = 1;
+  bytes definition_levels = 2;
+  bytes values = 3;
+}

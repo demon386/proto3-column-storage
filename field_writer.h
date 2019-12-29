@@ -1,11 +1,11 @@
 #ifndef FIELD_WRITER_
 #define FIELD_WRITER_
 
+#include <google/protobuf/message.h>
+
 #include <iostream>
 #include <memory>
 #include <vector>
-
-#include <google/protobuf/message.h>
 
 #include "proto_traits.h"
 #include "record_decoder.h"

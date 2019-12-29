@@ -4,6 +4,7 @@
 #include <string>
 
 #include <google/protobuf/message.h>
+#include <google/protobuf/io/coded_stream.h>
 
 namespace proto_column_storage {
 
@@ -23,6 +24,10 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_INT64> {
       return reflection->GetRepeatedInt64(msg, &field, idx);
     }
   }
+
+  static void Serialize(google::protobuf::io::CodedOutputStream* output_stream, ValueType val) {
+    output_stream->WriteVarint64(val);
+  }
 };
 
 template <>
@@ -37,6 +42,11 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_STRING> {
     } else {
       return reflection->GetRepeatedString(msg, &field, idx);
     }
+  }
+
+  void Serialize(google::protobuf::io::CodedOutputStream* output_stream, std::string&& val) {
+    output_stream->WriteVarint32(val.size());
+    output_stream->WriteString(val);
   }
 };
 
