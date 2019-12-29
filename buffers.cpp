@@ -4,7 +4,7 @@
 
 #include <limits>
 
-namespace proto_column_storage {
+namespace proto_column {
 
 FieldOutputBuffer::FieldOutputBuffer()
     : string_output_stream_(
@@ -68,4 +68,4 @@ bool FieldInputBuffer::ReadLevel(int* repetition_level, int* definition_level) {
   return true;
 }
 
-}  // namespace proto_column_storage
+}  // namespace proto_column

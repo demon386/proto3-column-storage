@@ -4,7 +4,7 @@
 
 #include "proto_traits.h"
 
-namespace proto_column_storage {
+namespace proto_column {
 
 TEST(Buffers, FieldOutputBuffer) {
   FieldOutputBuffer field_output_buffer;
@@ -41,4 +41,4 @@ TEST(Buffers, FieldBufferLevlsAndValues) {
                          field_input_buffer.mutable_value_input_stream()));
 }
 
-}  // namespace proto_column_storage
+}  // namespace proto_column

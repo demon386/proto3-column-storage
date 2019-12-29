@@ -2,7 +2,7 @@
 
 #include <glog/logging.h>
 
-namespace proto_column_storage {
+namespace proto_column {
 
 std::unique_ptr<FieldWriter> MakeFieldWriter(
     const google::protobuf::FieldDescriptor& field_descriptor,
@@ -143,4 +143,4 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
   }
 }
 
-}  // namespace proto_column_storage
+}  // namespace proto_column

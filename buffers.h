@@ -9,7 +9,7 @@
 
 #include "column.pb.h"
 
-namespace proto_column_storage {
+namespace proto_column {
 
 // Wrap internal data structure into a class to avoid exposing it.
 class FieldBuffer {
@@ -62,6 +62,6 @@ class FieldInputBuffer {
   std::unique_ptr<google::protobuf::io::CodedInputStream> coded_input_stream_;
 };
 
-}  // namespace proto_column_storage
+}  // namespace proto_column
 
 #endif  // DATA_STORE_H_

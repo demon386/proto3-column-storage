@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace proto_column_storage {
+namespace proto_column {
 
 template <typename google::protobuf::FieldDescriptor::CppType T>
 struct ProtoTraits;
@@ -68,6 +68,6 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_STRING> {
   }
 };
 
-}  // namespace proto_column_storage
+}  // namespace proto_column
 
 #endif  // PROTO_TRAITS_H_
