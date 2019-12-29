@@ -18,7 +18,7 @@ proto_column::DissectRecord(
     std::make_unique<proto_column::RecordDecoder>(&doc), &writer);
 writer.Flush();
 
-// Get output
+// Get serialized columns.
 std::map<std::string, proto_column::FieldOutputBuffer>& buffers =
     *writer.mutable_output_buffers();
 for (auto& column_to_buffer : buffers) {
