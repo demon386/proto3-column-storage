@@ -14,14 +14,16 @@ Required libraries:
 pb::Document doc;
 
 proto_column::MsgWriter writer(*doc.GetDescriptor());
-proto_column::DissectRecord(std::make_unique<RecordDecoder>(&doc), &writer);
+proto_column::DissectRecord(
+    std::make_unique<proto_column::RecordDecoder>(&doc), &writer);
 writer.Flush();
 
 // Get output
-const std::map<std::string, proto_column::FieldOutputBuffer> buffers = writer->mutable_output_buffers();
+std::map<std::string, proto_column::FieldOutputBuffer>& buffers =
+    *writer.mutable_output_buffers();
 for (auto& column_to_buffer : buffers) {
-    const std::string serialized = column_to_buffer.second.Serialize();    
-    ...
+  const std::string serialized = column_to_buffer.second.Serialize();
+  // ...
 }
 ```
 

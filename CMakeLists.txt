@@ -26,6 +26,13 @@ target_include_directories(proto_column PUBLIC
   ./
   ${CMAKE_CURRENT_BINARY_DIR})
 
+add_executable(demo
+  ${TEST_PROTO_SRCS}
+  demo.cpp)
+target_link_libraries(demo
+  proto_column
+  ${TEST_PROTO_HDRS})
+
 add_executable(tests
   ${TEST_PROTO_SRCS}
   tests/buffers_test.cpp
