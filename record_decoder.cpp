@@ -17,8 +17,9 @@ bool RecordDecoder::GetNextValue(FieldCursor* field_cursor) {
   const bool is_repeated = field->is_repeated();
   const int array_size =
       is_repeated ? reflection_->FieldSize(*message_, field) : 1;
-  // The initial value |array_pos_| is always valid here for repeated fields.
-  // Because if the field is present, then there's at least one value.
+  // The check of |array_pos_| is always valid here even for initial value (0).
+  // Because if the field is present, then there's at least one value (including
+  // repeated field).
   DCHECK_LT(array_pos_, array_size);
   field_cursor->field = field;
   if (field->is_repeated()) {
