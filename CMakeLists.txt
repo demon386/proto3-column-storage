@@ -9,17 +9,29 @@ find_package(Protobuf REQUIRED)
 enable_testing()
 find_package(GTest REQUIRED)
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS tests/test.proto protos/column.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS protos/column.proto)
+protobuf_generate_cpp(TEST_PROTO_SRCS TEST_PROTO_HDRS tests/test.proto)
 
-add_executable(tests tests/field_writer_test.cpp
-  tests/buffers_test.cpp
-  field_writer.cpp
+add_library(proto_column
+  ${PROTO_SRCS}
   buffers.cpp
-  ${PROTO_SRCS})
-target_include_directories(tests PRIVATE
-  ./
-  ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(tests GTest::GTest GTest::Main
+  field_writer.cpp
+  record_decoder.cpp)
+target_link_libraries(proto_column
   ${PROTO_HDRS}
   ${Protobuf_LIBRARIES}
   glog)
+
+target_include_directories(proto_column PUBLIC
+  ./
+  ${CMAKE_CURRENT_BINARY_DIR})
+
+add_executable(tests
+  ${TEST_PROTO_SRCS}
+  tests/buffers_test.cpp
+  tests/field_writer_test.cpp)
+target_link_libraries(tests
+  ${TEST_PROTO_HDRS}
+  GTest::GTest
+  GTest::Main
+  proto_column)
