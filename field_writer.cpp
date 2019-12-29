@@ -20,21 +20,21 @@ std::unique_ptr<FieldWriter> MakeFieldWriter(
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
       return std::make_unique<MsgWriter>(
           *field_descriptor.message_type(), number, repetition_level,
-          definition_level, field_descriptor.name(), parent);
+          definition_level, field_descriptor.full_name(), parent);
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
       using Writer =
           AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_INT64>;
       return std::make_unique<Writer>(number, repetition_level,
-                                      definition_level, field_descriptor.name(),
-                                      parent);
+                                      definition_level,
+                                      field_descriptor.full_name(), parent);
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
       using Writer =
           AtomicWriter<google::protobuf::FieldDescriptor::CPPTYPE_STRING>;
       return std::make_unique<Writer>(number, repetition_level,
-                                      definition_level, field_descriptor.name(),
-                                      parent);
+                                      definition_level,
+                                      field_descriptor.full_name(), parent);
     }
   }
   DCHECK(false) << "Not implemented yet";
@@ -43,17 +43,23 @@ std::unique_ptr<FieldWriter> MakeFieldWriter(
 
 MsgWriter::MsgWriter(const google::protobuf::Descriptor& descriptor,
                      int field_number, int repetition_level,
-                     int defintion_level, std::string field_name,
+                     int definition_level, std::string full_field_name,
                      MsgWriter* parent)
-    : FieldWriter(field_number, repetition_level, defintion_level,
-                  std::move(field_name)) {
+    : FieldWriter(field_number, repetition_level, definition_level,
+                  std::move(full_field_name)) {
   parent_ = parent;
+  if (parent_ == nullptr) {
+    output_buffers_ =
+        std::make_shared<std::map<std::string, FieldOutputBuffer>>();
+  } else {
+    output_buffers_ = parent_->output_buffers_;
+  }
   const int field_count = descriptor.field_count();
   for (int i = 0; i < field_count; i++) {
     const google::protobuf::FieldDescriptor& field_descriptor =
         *descriptor.field(i);
     field_writers_[field_descriptor.number()] = MakeFieldWriter(
-        field_descriptor, repetition_level, defintion_level, this);
+        field_descriptor, repetition_level, definition_level, this);
   }
 }
 
@@ -71,8 +77,13 @@ void MsgWriter::AddVersion(int repetition_level) {
   versions_.push_back(std::move(val));
 }
 
+void MsgWriter::Flush() {
+  Flush(/*parent_version=*/0, /*repetition_level=*/0,
+        /*def_level=*/0);
+}
+
 void MsgWriter::Flush(int parent_version, int repetition_level, int def_level) {
-  bool printed = false;
+  bool written = false;
   while (version_cursor_ < versions_.size() &&
          (parent_ == nullptr ||
           versions_[version_cursor_].parent_version == parent_version)) {
@@ -80,12 +91,12 @@ void MsgWriter::Flush(int parent_version, int repetition_level, int def_level) {
     def_level = definition_level();
     parent_version = version_cursor_;
     version_cursor_++;
-    printed = true;
+    written = true;
     for (auto& writer : field_writers_) {
       writer.second->Flush(parent_version, repetition_level, def_level);
     }
   }
-  if (!printed && parent_ != nullptr) {
+  if (!written && parent_ != nullptr) {
     parent_version = -1;
     for (auto& writer : field_writers_) {
       writer.second->Flush(parent_version, repetition_level, def_level);
@@ -101,7 +112,7 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
     const RecordDecoder::Position pos = decoder->GetNextField();
     DVLOG(2) << "Process field: " << pos.field->name();
     FieldWriter* child_writer = writer->GetChild(pos.field->number());
-    CHECK_EQ(child_writer->field_name(), pos.field->name());
+    CHECK_EQ(child_writer->field_name(), pos.field->full_name());
     DVLOG(2) << "Use writer: " << child_writer->field_name()
              << ". At repetition level: " << child_writer->repetition_level()
              << ". At definition level: " << child_writer->definition_level();

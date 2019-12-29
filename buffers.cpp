@@ -56,6 +56,7 @@ FieldInputBuffer::FieldInputBuffer(const std::string& serialized) {
 bool FieldInputBuffer::ReadLevel(int* repetition_level, int* definition_level) {
   DCHECK_EQ(column_.repetition_levels().size(),
             column_.definition_levels().size());
+  DVLOG(2) << "Read level (size): " << column_.repetition_levels().size();
   if (level_cursor_ >= column_.repetition_levels().size()) {
     return false;
   }

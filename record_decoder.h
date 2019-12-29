@@ -58,8 +58,11 @@ class RecordDecoder {
  private:
   int field_pos_ = 0;
   int array_pos_ = 0;
+  // Not owned by this class.
   const google::protobuf::Message* message_;
+  // Not owned by this class.
   const google::protobuf::Reflection* reflection_;
+  // Elements are not owned by this class.
   std::vector<const google::protobuf::FieldDescriptor*> fields_;
 };
 

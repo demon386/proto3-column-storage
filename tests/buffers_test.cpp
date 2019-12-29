@@ -4,7 +4,7 @@
 
 #include "proto_traits.h"
 
-using namespace proto_column_storage;
+namespace proto_column_storage {
 
 TEST(Buffers, FieldOutputBuffer) {
   FieldOutputBuffer field_output_buffer;
@@ -40,3 +40,5 @@ TEST(Buffers, FieldBufferLevlsAndValues) {
   EXPECT_EQ("world", Traits::Deserialize(
                          field_input_buffer.mutable_value_input_stream()));
 }
+
+}  // namespace proto_column_storage

@@ -62,11 +62,6 @@ class FieldInputBuffer {
   std::unique_ptr<google::protobuf::io::CodedInputStream> coded_input_stream_;
 };
 
-class OutputBuffers {
- private:
-  std::map<std::string, FieldBuffer> buffers_;
-};
-
 }  // namespace proto_column_storage
 
 #endif  // DATA_STORE_H_

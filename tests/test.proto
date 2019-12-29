@@ -17,6 +17,5 @@ message Document {
     repeated Language language = 1;
     string url = 2;
   }
-  int64 mytest = 3;
-  Name name = 4;
+  Name name = 3;
 }
