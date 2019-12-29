@@ -1,10 +1,10 @@
 #ifndef PROTO_TRAITS_H_
 #define PROTO_TRAITS_H_
 
-#include <string>
-
-#include <google/protobuf/message.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/message.h>
+
+#include <string>
 
 namespace proto_column_storage {
 
@@ -25,8 +25,16 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_INT64> {
     }
   }
 
-  static void Serialize(google::protobuf::io::CodedOutputStream* output_stream, ValueType val) {
+  static void Serialize(google::protobuf::io::CodedOutputStream* output_stream,
+                        ValueType val) {
     output_stream->WriteVarint64(val);
+  }
+
+  static ValueType Deserialize(
+      google::protobuf::io::CodedInputStream* input_stream) {
+    uint64_t val;
+    input_stream->ReadVarint64(&val);
+    return static_cast<ValueType>(val);
   }
 };
 
@@ -44,9 +52,19 @@ struct ProtoTraits<google::protobuf::FieldDescriptor::CPPTYPE_STRING> {
     }
   }
 
-  void Serialize(google::protobuf::io::CodedOutputStream* output_stream, std::string&& val) {
+  static void Serialize(google::protobuf::io::CodedOutputStream* output_stream,
+                        std::string&& val) {
     output_stream->WriteVarint32(val.size());
     output_stream->WriteString(val);
+  }
+
+  static ValueType Deserialize(
+      google::protobuf::io::CodedInputStream* input_stream) {
+    uint32_t size;
+    input_stream->ReadVarint32(&size);
+    ValueType val;
+    input_stream->ReadString(&val, size);
+    return val;
   }
 };
 

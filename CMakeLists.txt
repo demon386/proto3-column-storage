@@ -12,7 +12,7 @@ find_package(GTest REQUIRED)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS tests/test.proto protos/column.proto)
 
 add_executable(tests tests/test.cpp
-  tests/buffer_test.cpp
+  tests/buffers_test.cpp
   field_writer.cpp
   buffers.cpp
   ${PROTO_SRCS})
