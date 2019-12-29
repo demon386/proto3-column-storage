@@ -108,11 +108,11 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
                    int repetition_level) {
   writer->AddVersion(repetition_level);
   std::set<int> seen_fields;
-  while (decoder->HasNext()) {
-    const RecordDecoder::Position pos = decoder->GetNextField();
-    DVLOG(2) << "Process field: " << pos.field->name();
-    FieldWriter* child_writer = writer->GetChild(pos.field->number());
-    CHECK_EQ(child_writer->field_name(), pos.field->full_name());
+  RecordDecoder::FieldCursor field_cursor;
+  while (decoder->GetNextValue(&field_cursor)) {
+    DVLOG(2) << "Process field: " << field_cursor.field->name();
+    FieldWriter* child_writer = writer->GetChild(field_cursor.field->number());
+    DCHECK_EQ(child_writer->field_name(), field_cursor.field->full_name());
     DVLOG(2) << "Use writer: " << child_writer->field_name()
              << ". At repetition level: " << child_writer->repetition_level()
              << ". At definition level: " << child_writer->definition_level();
@@ -120,7 +120,7 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
     int child_repetition_level = repetition_level;
     if (seen_fields.find(child_writer->field_number()) != seen_fields.cend()) {
       child_repetition_level = child_writer->repetition_level();
-      DVLOG(2) << "Seen: " << pos.field->name() << std::endl;
+      DVLOG(2) << "Seen: " << field_cursor.field->name() << std::endl;
       DVLOG(2) << "Change repetition level to: " << child_repetition_level;
     } else {
       seen_fields.insert(child_writer->field_number());
@@ -128,13 +128,13 @@ void DissectRecord(std::unique_ptr<RecordDecoder> decoder, MsgWriter* writer,
 
     if (child_writer->is_atomic()) {
       dynamic_cast<AtomicWriterBase*>(child_writer)
-          ->Write(*decoder->message(), *pos.field, child_repetition_level,
-                  pos.array_pos);
+          ->Write(*decoder->message(), *field_cursor.field,
+                  child_repetition_level, field_cursor.array_pos);
     } else {
       const google::protobuf::Reflection& reflection =
           *decoder->message()->GetReflection();
       const google::protobuf::Message& msg =
-          reflection.GetMessage(*decoder->message(), pos.field);
+          reflection.GetMessage(*decoder->message(), field_cursor.field);
       DVLOG(2) << "Going deeper";
       DissectRecord(std::make_unique<RecordDecoder>(&msg),
                     dynamic_cast<MsgWriter*>(child_writer),
