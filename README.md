@@ -9,7 +9,7 @@ Required libraries:
 - Google test
 - Glog
 
-Serialize a Proto into column format:
+### Serialize a Proto into column format
 ```
 pb::Document doc;
 
@@ -24,3 +24,6 @@ for (auto& column_to_buffer : buffers) {
     ...
 }
 ```
+
+### Deserialize and re-construct Proto
+TODO
