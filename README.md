@@ -12,17 +12,10 @@ Required libraries:
 ### Serialize a Proto into column format
 ```
 pb::Document doc;
-
-proto_column::MsgWriter writer(*doc.GetDescriptor());
-proto_column::DissectRecord(
-    std::make_unique<proto_column::RecordDecoder>(&doc), &writer);
-writer.Flush();
-
-// Get serialized columns.
-std::map<std::string, proto_column::FieldOutputBuffer>& buffers =
-    *writer.mutable_output_buffers();
-for (auto& column_to_buffer : buffers) {
-  const std::string serialized = column_to_buffer.second.Serialize();
+// Full field name to serialized data.
+std::map<std::string, std::string> serialized = proto_column::Serialize(doc);
+for (const auto& column_and_data : serialized) {
+  const std::string& serialized = column_and_data.second;
   // ...
 }
 ```

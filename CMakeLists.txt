@@ -16,7 +16,8 @@ add_library(proto_column
   ${PROTO_SRCS}
   buffers.cpp
   field_writer.cpp
-  record_decoder.cpp)
+  record_decoder.cpp
+  serialization.cpp)
 target_link_libraries(proto_column
   ${PROTO_HDRS}
   ${Protobuf_LIBRARIES}
@@ -36,7 +37,8 @@ target_link_libraries(demo
 add_executable(tests
   ${TEST_PROTO_SRCS}
   tests/buffers_test.cpp
-  tests/field_writer_test.cpp)
+  tests/field_writer_test.cpp
+  tests/serialization_test.cpp)
 target_link_libraries(tests
   ${TEST_PROTO_HDRS}
   GTest::GTest
